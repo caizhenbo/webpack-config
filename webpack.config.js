@@ -5,6 +5,7 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin'); //将你的行�
 var HtmlWebpackPlugin = require('html-webpack-plugin'); //html模板生成器
 var CleanPlugin = require('clean-webpack-plugin'); // 文件夹清除工具
 var CopyWebpackPlugin = require('copy-webpack-plugin'); // 文件拷贝
+var HtmlCriticalPlugin = require("html-critical-webpack-plugin"); //关键css
 
 var config = {
     entry: { //配置入口文件，有几个写几个
@@ -130,7 +131,28 @@ pages.forEach(function(pathname) {
         }
     }
     config.plugins.push(new HtmlWebpackPlugin(conf));
+
+    if (process.env.NODE_ENV == 'production') {
+        //抽取关键css
+        config.plugins.push(
+            new HtmlCriticalPlugin({
+                base: path.join(path.resolve(__dirname), 'dist/'),
+                src: itemName[1] + '.html',
+                dest: itemName[1] + '.html',
+                inline: true,
+                minify: true,
+                extract: true,
+                width: 375,
+                height: 565,
+                penthouse: {
+                    blockJSRequests: false,
+                }
+            })
+        )
+    }
 });
+
+
 
 
 //按文件名来获取入口文件（即需要生成的模板文件数量）
